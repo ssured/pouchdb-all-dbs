@@ -61,7 +61,7 @@ module.exports = function (Pouch) {
 
   Pouch.on('created', function (dbName) {
     dbName = normalize(dbName);
-    if (canIgnore(dbName)) {
+    if (canIgnore(dbName) || !pouch) {
       return;
     }
     dbName = prefixed(dbName);
@@ -85,7 +85,7 @@ module.exports = function (Pouch) {
 
   Pouch.on('destroyed', function (dbName) {
     dbName = normalize(dbName);
-    if (canIgnore(dbName)) {
+    if (canIgnore(dbName) || !pouch) {
       return;
     }
     dbName = prefixed(dbName);
@@ -109,6 +109,9 @@ module.exports = function (Pouch) {
 
   Pouch.allDbs = utils.toPromise(function (callback) {
     init();
+    if (!pouch) {
+      return;
+    }
     queue.add(function (callback) {
 
       if (cache) {
@@ -133,6 +136,9 @@ module.exports = function (Pouch) {
   });
 
   Pouch.resetAllDbs = utils.toPromise(function (callback) {
+    if (!pouch) {
+      return;
+    }
     queue.add(function (callback) {
       pouch.destroy().then(function () {
         pouch = null;
